@@ -15,11 +15,11 @@ dir_name="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # First argument should be either the path to a markdown file
 #   that will be used as input
-#   or '--stdin', in which case the script will read from the standard input
+#   or '--stdin', in which case the script will read from the standard input.
 #
 # Second argument should be either the path to a file
 #   to which the HTML output will be written,
-#   or '--stdout', in which case the script will write to the standard output
+#   or '--stdout', in which case the script will write to the standard output.
 #
 
 # check that we get exactly 2 arguments
@@ -52,21 +52,6 @@ fi
 
 # This script uses the following environment variables.
 #
-# CSS_FILES: a comma-separated list of paths to css files.
-#   Default value: "css/github-markdown.css,css/normalize.css"
-#
-# TITLE: The contents of the title tag in the HTML file.
-#     Will be typically shown as the title of the browser window.
-#     If not set, we will use the filename (without path and extension) as title.
-#
-# LINK_CSS: Whether to link to the CSS files or whether to paste them.
-#     Not set or set to "false" (default behavior):
-#         Script will paste the contents of the CSS files into the output file.
-#         CSS files DO need to be present when running this script.
-#     Set to "true":
-#         Script will emit a <link> tag.
-#         CSS files do not need to be present when running this script.
-#
 # SKIP_REPLACEMENT: Whether to replace 'user-content-' in the HTML file.
 #     Not set or set to "false" (default behavior):
 #       ...
@@ -74,6 +59,25 @@ fi
 #         Don't execute replacement.
 #         (Links to headings will not work without JS magic.-)
 #
+# TITLE: The contents of the title tag in the HTML file.
+#     Will be typically shown as the title of the browser window.
+#     If not set (default), we will use the filename (without path and extension) as title.
+#
+# LINK_CSS: Whether to link to the CSS files or whether to paste them.
+#     Not set or set to "false" (default):
+#         Script will paste the contents of the CSS files into the output file.
+#         CSS files DO need to be present when running this script.
+#     Set to "true":
+#         Script will emit a <link> tag.
+#         CSS files do not need to be present when running this script.
+#
+# CSS_FILES: a comma-separated list of paths to css files.
+#   Default value: "css/github-markdown.css,css/normalize.css,css/style.css"
+#   Note that if LINK_CSS is not set (default behavior), the contents of these files will be pasted into the output file.
+#   This in particular means that the files need to be present when running this script.
+#   When using relative paths, this also means that the script needs to be called from the correct directory.
+#
+
 
 # set default value for CSS_FILES
 if [ -z "${CSS_FILES+x}" ]
@@ -82,12 +86,12 @@ then
     then
         # Using inline mode.
         # We prepend the directory path to make sure that the files can be found.
-        CSS_FILES="$dir_name/css/normalize.css,$dir_name/css/github-markdown.css"
+        CSS_FILES="$dir_name/css/normalize.css,$dir_name/css/github-markdown.css,$dir_name/css/style.css"
     else
         # Not using inline mode.
         # We simply use the relative path "css/"
         #   and hope that the user will put the CSS files there.
-        CSS_FILES=css/github-markdown.css,css/normalize.css
+        CSS_FILES=css/github-markdown.css,css/normalize.css,css/style.css
     fi
 fi
 

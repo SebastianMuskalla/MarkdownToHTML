@@ -1,0 +1,40 @@
+/* replicate the look of the GitHub web interface */
+.markdown-body
+{
+    box-sizing: border-box;
+    min-width: 200px;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 45px;
+}
+
+@media (max-width: 767px)
+{
+    .markdown-body
+    {
+        padding: 15px;
+    }
+}
+
+/* set the body background color to the same background color as .markdown-body,
+   as specified by github-markdown.css */
+@media (prefers-color-scheme: light)
+{
+    body
+    {
+        --color-canvas-default: #ffffff;
+    }
+}
+
+@media (prefers-color-scheme: dark)
+{
+    body
+    {
+        --color-canvas-default: #0d1117;
+    }
+}
+
+body
+{
+    background-color: var(--color-canvas-default, #ffffff);
+}
