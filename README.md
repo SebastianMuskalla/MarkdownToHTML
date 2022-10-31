@@ -4,7 +4,8 @@ MarkdownToHTML
 
 This is a script for converting markdown files into standalone fully styled HTML files using the GitHub API (<https://docs.github.com/en/rest/markdown>).
 
-**This code is available as the docker container `smuskalla/markdown-to-html` on Docker Hub, <https://hub.docker.com/r/smuskalla/markdown-to-html>**
+**MarkdownToHTML is available as the docker container `smuskalla/markdown-to-html` on Docker Hub, <https://hub.docker.com/r/smuskalla/markdown-to-html>.**
+
 
 TL;DR
 -----
@@ -28,6 +29,7 @@ Clone this repository and check that `jq` and `curl` are available
 ```sh
 ./markdownToHTML.sh input.md output.html
 ```
+
 
 Details
 -------
@@ -72,6 +74,7 @@ where
    In order to make links to headings like `#my-nice-heading` work, GitHub uses JavaScript on its site to remap `#my-nice-heading` to `#user-content-my-nice-heading`.
    In order to avoid having to embed such JavaScript code, we replace all occurrences of `<a id="user-content-` by `<a id="` in the HTML file.
    This behavior can be disabled using the `SKIP_REPLACEMENT` environment, variables.
+
 
 Environment variables
 ---------------------
@@ -162,7 +165,6 @@ docker run \
     smuskalla/markdown-to-html /files/input.md /files/output.html
 ```
 
-
 ### Modifying the CSS files
 
 Assume you want to use `github-markdown-dark.css` instead of `github-markdown.css` from <https://github.com/sindresorhus/github-markdown-css>.
@@ -170,7 +172,7 @@ Additionally, you want to use your own CSS file `mystyle.css`.
 
 When running locally, simply put these files into the `css/` folder and set the environment variable `CSS_FILES` accordingly, e.g.
 ```sh
-export CSS_FILES=css/github-markdown-dark.css,css/mystyle.css
+export CSS_FILES="css/github-markdown-dark.css,css/mystyle.css"
 ./markdownToHTML.sh input.md output.html
 ```
 (Note that if you use relative paths like `css/`, you have to make sure that you call `markdownToHTML.sh` from the directory that contains the `css/` folder.)
@@ -188,6 +190,13 @@ docker run \
     smuskalla/markdown-to-html /files/input.md /files/output.html
 ```
 
+Note: If you use `LINK_FILES=true`, you can avoid having to mount the CSS files.
+
+### FetchCSSFiles.sh
+
+The provided script [fetchCSSFiles.sh](fetchCSSFiles.sh) can be used to update `normalize.css` and `github-markdown.css` to the newest version.
+
+
 LICENSE
 -------
 
@@ -199,4 +208,4 @@ MarkdownToHTML comes with *normalize.css* (<https://necolas.github.io/normalize.
 
 MarkdownToHTML comes with *github-markdown-css* (<https://github.com/sindresorhus/github-markdown-css>), copyright Sindre Sorhus, licensed under the MIT License, see [css/github-markdown-css.LICENSE](css/github-markdown-css.LICENSE).
 
-This project was inspired by jfroche's *docker-markdown* (<https://github.com/jfroche/docker-markdown>).
+MarkdownToHTML was inspired by jfroche's *docker-markdown* (<https://github.com/jfroche/docker-markdown>).
