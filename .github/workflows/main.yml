@@ -1,0 +1,25 @@
+name: Publish container on Docker Hub
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+            - name: docker login
+              env:
+                  DOCKER_USER: ${{secrets.DOCKER_USER}}
+                  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+              run: |
+                  docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+            - name: docker build
+              run: docker build . --file Dockerfile --tag smuskalla/markdown-to-html:latest
+            - name: docker push
+              run: docker push smuskalla/markdown-to-html
+      
