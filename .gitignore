@@ -1,0 +1,4 @@
+*.code-workspace
+/*.html
+/*.md
+!README.md
