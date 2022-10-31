@@ -10,6 +10,8 @@ COPY markdownToHTML.sh /script/
 COPY templates/* /script/templates/
 COPY css/*.css /script/css/
 
+WORKDIR /script/
+
 RUN chmod +x /script/markdownToHTML.sh
 
 ENTRYPOINT ["/script/markdownToHTML.sh"]
