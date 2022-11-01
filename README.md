@@ -2,9 +2,9 @@ MarkdownToHTML
 ==============
 
 
-This is a script for converting markdown files into standalone fully styled HTML files using the GitHub API (<https://docs.github.com/en/rest/markdown>).
+This is a bash script for converting markdown files into standalone fully styled HTML files using the GitHub API (<https://docs.github.com/en/rest/markdown>).
 
-**MarkdownToHTML is available as the docker container `smuskalla/markdown-to-html` on Docker Hub, <https://hub.docker.com/r/smuskalla/markdown-to-html>.**
+**MarkdownToHTML is available as the docker container `smuskalla/markdown-to-html` on Docker Hub: <https://hub.docker.com/r/smuskalla/markdown-to-html>.**
 
 
 TL;DR
@@ -23,7 +23,7 @@ docker run -v "$(pwd):/files" smuskalla/markdown-to-html /files/input.md /files/
 
 ### Run natively:
 
-Clone this repository and check that `jq` and `curl` are available
+Clone this repository and check that `bash`, `jq`, and `curl` are available
 (On Ubuntu/Debian: `sudo apt install jq curl`). Then run
 
 ```sh
@@ -73,7 +73,7 @@ where
    **Why?** A heading `My nice Heading` in the markdown file will be converted to an `<a>` tag with the id `user-content-my-nice-heading` by the GitHub API.
    In order to make links to headings like `#my-nice-heading` work, GitHub uses JavaScript on its site to remap `#my-nice-heading` to `#user-content-my-nice-heading`.
    In order to avoid having to embed such JavaScript code, we replace all occurrences of `<a id="user-content-` by `<a id="` in the HTML file.
-   This behavior can be disabled using the `SKIP_REPLACEMENT` environment, variables.
+   This behavior can be disabled using the `SKIP_REPLACEMENT` environment variable.
 
 
 Environment variables
