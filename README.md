@@ -101,6 +101,15 @@ export TITLE="My Title"
 
 ### Environment variables
 
+* **GITHUB_USERNAME**, **GITHUB_TOKEN**:
+
+    Default value: unset
+
+    You can use this script with authentication.
+    However, this means that the GitHub API will limit the number of requests you can make to a few dozens per hour.
+    You can raise this limit by authenticating using these environment variables.
+    For more information see below under [Advanced usage](#advanced-usage)
+
 * **SKIP_REPLACEMENT**
 
   Default value: unset
@@ -140,6 +149,37 @@ export TITLE="My Title"
 
 Advanced usage
 --------------
+
+### Authenticating your requests to avoid getting rate limited
+
+The GitHub API uses a rate limit, i.e. you can only make a certain number of requests per hour (see <https://docs.github.com/en/rest/overview/resources-in-the-rest-api#rate-limiting>).
+This rate limit is pretty low if you don't authenticate.
+Note that MarkdownToHTML will currently not check whether you have exceeded the limit.
+However, the generated HTML will contain an error message instead of the desired output if you run into the rate limit.
+
+You can authenticate your requests to get a much higher rate limit.
+To this end, you can use the environment variables `GITHUB_USERNAME` and `GITHUB_TOKEN` as shown below.
+
+I recommend not using your GitHub password as the value for `GITHUB_TOKEN`.
+Instead, you can create and use a *fine-grained personal access token* (<https://github.com/settings/tokens>, Account Settings > Developer settings > Personal access tokens > Fine-grained tokens).
+You can create the token so that it has no permissions for any of your repositories and no account permissions.
+Such a token will be sufficient for using the markdown API, and it will minimize the risk to your account in case the token gets leaked.
+
+Authentication example using the docker container:
+```sh
+docker run \
+    -v "$(pwd):/files" \
+    -e GITHUB_USERNAME="MyGithubUsername" \
+    -e GITHUB_TOKEN="github_pat_111111111AAAAAAAAAA" \
+    smuskalla/markdown-to-html /files/input.md /files/output.html
+```
+
+Authentication example using `markdownToHHTML.sh`:
+```sh
+export GITHUB_USERNAME="MyGithubUsername"
+export GITHUB_TOKEN="github_pat_111111111AAAAAAAAAA"
+./markdownToHTML.sh input.md output.html
+```
 
 ### Modifying the templates
 

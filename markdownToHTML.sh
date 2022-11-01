@@ -52,6 +52,17 @@ fi
 
 # This script uses the following environment variables.
 #
+# GITHUB_USERNAME &
+# GITHUB_TOKEN:
+#     If GITHUB_USERNAME is set, the request sent to the github API using curl
+#     will use the provided username and token (/password).
+#     This script will work even without authentification (default behavior),
+#     but you will be limited to a certain number of requests per hour.
+#     If you provide a username, this limit is much higher.
+#     I recommend creating and using a "Fine-grained personal access tokens"
+#     (GitHub > Account Settings > Developer settings > Personal Access Tokens > Fine-grained tokens)
+#     that has no account permissions and no permissions for any of your repositories.
+#
 # SKIP_REPLACEMENT: Whether to replace 'user-content-' in the HTML file.
 #     Not set or set to "false" (default behavior):
 #       ...
@@ -179,8 +190,14 @@ cat "$dir_name/templates/center.html" >> $temp_file
 # Step 5: Markdown conversion using the GitHub API
 #
 
+authstring=""
+if [ ! -z "${GITHUB_USERNAME+x}" ]
+then
+    authstring="-u $GITHUB_USERNAME:$GITHUB_TOKEN"
+fi
+
 jq --slurp --raw-input '{"text": "\(.)", "mode": "markdown"}' < "$input_file" |
-    curl -s --data @- https://api.github.com/markdown >> $temp_file
+    curl $authstring -s --data @- https://api.github.com/markdown >> $temp_file
 
 
 #
