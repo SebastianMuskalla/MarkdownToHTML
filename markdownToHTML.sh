@@ -2,8 +2,6 @@
 set -eEuo pipefail
 IFS=$'\n\t'
 
-# set -x
-
 # Fetch location of this script.
 # This allows us to handle the case that the script is called from another location.
 dir_name="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -89,7 +87,6 @@ fi
 #   When using relative paths, this also means that the script needs to be called from the correct directory.
 #
 
-
 # set default value for CSS_FILES
 if [ -z "${CSS_FILES+x}" ]
 then
@@ -128,8 +125,6 @@ cat "$dir_name/templates/head.html" >> $temp_file
 # Step 2: Title
 #
 
-# TITLE=testtitle
-
 if [ -z "${TITLE+x}" ]
 then
     # TITLE variable is not set.
@@ -150,8 +145,6 @@ fi
 #
 # Step 3: CSS files
 #
-
-# LINK_CSS=true
 
 # process CSS_FILES as a comma separated list
 oldIFS=$IFS
@@ -210,8 +203,6 @@ cat "$dir_name/templates/foot.html" >> $temp_file
 #
 # Step 7: Get rid of 'user-content-' (unless SKIP_REPLACEMENT has been specified)
 #
-
-# SKIP_REPLACEMENT=true
 
 if [ -z "${SKIP_REPLACEMENT+x}" ] || [ "$SKIP_REPLACEMENT" != "true" ];
 then

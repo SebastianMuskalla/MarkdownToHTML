@@ -105,10 +105,10 @@ export TITLE="My Title"
 
     Default value: unset
 
-    You can use this script with authentication.
+    You can use this script without authentication.
     However, this means that the GitHub API will limit the number of requests you can make to a few dozens per hour.
     You can raise this limit by authenticating using these environment variables.
-    For more information see below under [Advanced usage](#advanced-usage)
+    For more information see below under [Advanced usage](#advanced-usage).
 
 * **SKIP_REPLACEMENT**
 
@@ -132,7 +132,7 @@ export TITLE="My Title"
   This leads to standalone HTML files, but also increases the size of each file by roughly 30 kilobytes, which is wasteful when multiple HTML files could share the same CSS file.
 
   If this environment variable is set to true (`LINK_CSS=true`), MarkdownToHTML will instead of pasting the CSS files just put a `<link>` tag for each CSS file.
-  Note that this also means that the CSS files do not have to present when running MarkdownToHTML.
+  Note that this also means that the CSS files do not have to be present when running MarkdownToHTML.
 
 * **CSS_FILES**
 
@@ -144,7 +144,7 @@ export TITLE="My Title"
   This means that the files need to be present when running MarkdownToHTML.
 
   When LINK_CSS is set to true, MarkdownToHTML will simply emit a `<link>` tag for each file.
-  The files do not need to present when running MarkdownToHTML.
+  The files do not need to be present when running MarkdownToHTML.
 
 
 Advanced usage
