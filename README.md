@@ -2,7 +2,7 @@ MarkdownToHTML
 ==============
 
 
-This is a bash script for converting markdown files into standalone fully styled HTML files using the GitHub API (<https://docs.github.com/en/rest/markdown>).
+This is a Bash script for converting markdown files into standalone fully styled HTML files using the GitHub API (<https://docs.github.com/en/rest/markdown>).
 
 **MarkdownToHTML is available as the docker container `smuskalla/markdown-to-html` on Docker Hub: <https://hub.docker.com/r/smuskalla/markdown-to-html>.**
 
@@ -16,7 +16,7 @@ Assume you want to convert the markdown file `input.md` into `output.html`.
 
 ```sh
 # Option 1: Using standard input/output
-cat input.md | docker run -i smuskalla/markdown-to-html --stdin --stdout > output.html
+docker run -i smuskalla/markdown-to-html < input.md > output.html
 # Option 2: Mounting the current directory as a volume
 docker run -v "$(pwd):/files" smuskalla/markdown-to-html /files/input.md /files/output.html
 ```
@@ -27,6 +27,9 @@ Clone this repository and check that `bash`, `jq`, and `curl` are available
 (On Ubuntu/Debian: `sudo apt install jq curl`). Then run
 
 ```sh
+# Option 1:
+./markdownToHTML.sh < input.md > output.html
+# Option 2:
 ./markdownToHTML.sh input.md output.html
 ```
 
@@ -50,7 +53,10 @@ where
 * `OUTPUTFULE` is the path to an output file or `--stdout`.
   In the latter case, the script will write to the standard output.
 
-**Note:** When using the script via `docker run` in combination with `--stdin`, it is important to pass the `-i` (`--interactive`) flag.
+Not providing any argument is equivalent to using `--stdin` and `--stdout`.
+Just providing one argument is equivalent to providing an `INPUTFILE` and using `--stdout`.
+
+**Note:** When using the script via `docker run` in combination with `--stdin` or zero arguments, it is important to pass the `-i` (`--interactive`) flag.
 
 ### Steps:
 
@@ -91,7 +97,7 @@ docker run \
     smuskalla/markdown-to-html /files/input.md /files/output.html
 ```
 
-### Setting environment variables using bash
+### Setting environment variables using Bash
 
 Use the `export` command to set the environment variables before calling the script, e.g.
 ```sh
@@ -140,11 +146,14 @@ export TITLE="My Title"
 
   A comma-separated list of CSS files that will be included in the HTML file.
 
-  When LINK_CSS is unset (default behavior), MarkdownToHTML will paste these files into the output HTML file.
+  When `LINK_CSS` is unset or set to false (default behavior), MarkdownToHTML will paste these files into the output HTML file.
   This means that the files need to be present when running MarkdownToHTML.
 
-  When LINK_CSS is set to true, MarkdownToHTML will simply emit a `<link>` tag for each file.
+  When `LINK_CSS` is set to true, MarkdownToHTML will simply emit a `<link>` tag for each file.
   The files do not need to be present when running MarkdownToHTML.
+
+  Note that when `LINK_CSS` is not set to true, relative paths in `CSS_FILES` are always assumed to be relative to the location of `markdownToHTML.sh`.
+  Inside the docker container, this means they are relative to the directory `/script/`.
 
 
 Advanced usage
@@ -215,7 +224,6 @@ When running locally, simply put these files into the `css/` folder and set the 
 export CSS_FILES="css/github-markdown-dark.css,css/mystyle.css"
 ./markdownToHTML.sh input.md output.html
 ```
-(Note that if you use relative paths like `css/`, you have to make sure that you call `markdownToHTML.sh` from the directory that contains the `css/` folder.)
 
 When running MarkdownToHTML via docker, proceed as follows:
 * Download this repository.

@@ -3,7 +3,6 @@ set -eEuo pipefail
 IFS=$'\n\t'
 
 # Fetch location of this script.
-# This allows us to handle the case that the script is called from another location.
 dir_name="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 
@@ -19,30 +18,55 @@ dir_name="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 #   to which the HTML output will be written,
 #   or '--stdout', in which case the script will write to the standard output.
 #
+# If no argument is provided, we use standard input/output.
+#
+# If just one argument is provided, we use this argument as input file and write to standard output.
 
-# check that we get exactly 2 arguments
-if [ "$#" -ne 2 ]; then
+
+using_stdin=false
+using_stdout=false
+
+case "$#" in
+
+  0)
+    using_stdin=true
+    input_file=/dev/stdin
+    using_stdout=true
+    ;;
+
+  1)
+    using_stdout=true
+    if [ "${1,,}" == "--stdin" ]; # convert to lowercase
+    then
+        using_stdin=true
+        input_file=/dev/stdin
+    else
+        input_file=${1}
+    fi
+    ;;
+
+  2)
+    if [ "${1,,}" == "--stdin" ]; # convert to lowercase
+    then
+        using_stdin=true
+        input_file=/dev/stdin
+    else
+        input_file=${1}
+    fi
+    if [ "${2,,}" == "--stdout" ];  # convert to lowercase
+    then
+        using_stdout=true
+    fi
+    ;;
+  *)
     echo "Usage: markdownToHTML.sh INPUTFILE OUTPUTFILE"
     echo "    INPUTFILE may be --stdin to read from the standard input"
     echo "    OUTPUTFILE may be --stdout to write to the standard output"
+    echo "    If no arguments are provided, assume --stdin and --stdout."
+    echo "    If one argument is provided, this argument is INPUTFILE, assume --stdout."
     exit 1
-fi
-
-using_stdin=false
-if [ "${1,,}" == "--stdin" ]; # convert to lowercase
-then
-    using_stdin=true
-    input_file=/dev/stdin
-else
-    input_file=${1}
-fi
-
-using_stdout=false
-if [ "${2,,}" == "--stdout" ];  # convert to lowercase
-then
-    using_stdout=true
-fi
-
+    ;;
+esac
 
 #
 # Processing environment variables
@@ -84,23 +108,15 @@ fi
 #   Default value: "css/github-markdown.css,css/normalize.css,css/style.css"
 #   Note that if LINK_CSS is not set (default behavior), the contents of these files will be pasted into the output file.
 #   This in particular means that the files need to be present when running this script.
-#   When using relative paths, this also means that the script needs to be called from the correct directory.
 #
 
 # set default value for CSS_FILES
 if [ -z "${CSS_FILES+x}" ]
 then
-    if [ -z "${LINK_CSS+x}" ] || [ "$LINK_CSS" != "true" ];
-    then
-        # Using inline mode.
-        # We prepend the directory path to make sure that the files can be found.
-        CSS_FILES="$dir_name/css/normalize.css,$dir_name/css/github-markdown.css,$dir_name/css/style.css"
-    else
-        # Not using inline mode.
-        # We simply use the relative path "css/"
-        #   and hope that the user will put the CSS files there.
-        CSS_FILES=css/github-markdown.css,css/normalize.css,css/style.css
-    fi
+    # Not using inline mode.
+    # We simply use the relative path "css/"
+    #   and hope that the user will put the CSS files there.
+    CSS_FILES=css/github-markdown.css,css/normalize.css,css/style.css
 fi
 
 
@@ -151,14 +167,21 @@ oldIFS=$IFS
 IFS=","
 for style_file in ${CSS_FILES}
 do
-    style_file_without_path=$(basename -- "$style_file")
-
     # echo $style_file
 
     if [ -z "${LINK_CSS+x}" ] || [ "$LINK_CSS" != "true" ];
     then
         # Using inline mode.
         # Actually paste the contents of the css files into the output.
+
+        style_file_without_path=$(basename -- "$style_file")
+
+        # Relative paths are always assumed to be relative
+        # to the location of this script.
+        if [[ ! "$style_file" = /* ]]; then
+            style_file="$dir_name/$style_file"
+        fi
+
         echo "<!-- contents of $style_file_without_path -->" >> "$temp_file"
         echo "<style>" >> "$temp_file"
         cat "$style_file" >> "$temp_file"
