@@ -111,14 +111,14 @@ fi
 temp_file=$(mktemp /tmp/styleincludes.template.html.XXXXXX)
 
 # set up a trap that deltes the temp file when this script terminates
-trap "rm -f $temp_file" 0 2 3 15
+trap 'rm -f $temp_file' 0 2 3 15
 
 
 #
 # Step 1: Head template
 #
 
-cat "$dir_name/templates/head.html" >> $temp_file
+cat "$dir_name/templates/head.html" >> "$temp_file"
 
 
 #
@@ -134,11 +134,11 @@ then
     then
         filename=$(basename -- "${1}") # get just the filename
         filename="${filename%.*}" # remove extension
-        echo "<title>$filename</title>" >> $temp_file
+        echo "<title>$filename</title>" >> "$temp_file"
     fi
 else
     # TITLE is set, use it
-    echo "<title>$TITLE</title>" >> $temp_file
+    echo "<title>$TITLE</title>" >> "$temp_file"
 fi
 
 
@@ -159,14 +159,14 @@ do
     then
         # Using inline mode.
         # Actually paste the contents of the css files into the output.
-        echo "<!-- contents of $style_file_without_path -->" >> $temp_file
-        echo "<style>" >> $temp_file
-        cat "$style_file" >> $temp_file
-        echo "</style>"  >> $temp_file
+        echo "<!-- contents of $style_file_without_path -->" >> "$temp_file"
+        echo "<style>" >> "$temp_file"
+        cat "$style_file" >> "$temp_file"
+        echo "</style>"  >> "$temp_file"
     else
         # Not using inline mode.
         # Simply emit a link tag.
-        echo "<link rel="stylesheet" href=\"$style_file\">" >> $temp_file
+        echo "<link rel=\"stylesheet\" href=\"$style_file\">" >> "$temp_file"
     fi
 done
 IFS=$oldIFS
@@ -176,7 +176,7 @@ IFS=$oldIFS
 # Step 4: Center template
 #
 
-cat "$dir_name/templates/center.html" >> $temp_file
+cat "$dir_name/templates/center.html" >> "$temp_file"
 
 
 #
@@ -184,20 +184,20 @@ cat "$dir_name/templates/center.html" >> $temp_file
 #
 
 authstring=""
-if [ ! -z "${GITHUB_USERNAME+x}" ]
+if [ -n "${GITHUB_USERNAME+x}" ]
 then
     authstring="-u $GITHUB_USERNAME:$GITHUB_TOKEN"
 fi
 
 jq --slurp --raw-input '{"text": "\(.)", "mode": "markdown"}' < "$input_file" |
-    curl $authstring -s --data @- https://api.github.com/markdown >> $temp_file
+    curl "$authstring" -s --data @- https://api.github.com/markdown >> "$temp_file"
 
 
 #
 # Step 6: Foot template
 #
 
-cat "$dir_name/templates/foot.html" >> $temp_file
+cat "$dir_name/templates/foot.html" >> "$temp_file"
 
 
 #
@@ -206,7 +206,7 @@ cat "$dir_name/templates/foot.html" >> $temp_file
 
 if [ -z "${SKIP_REPLACEMENT+x}" ] || [ "$SKIP_REPLACEMENT" != "true" ];
 then
-    sed -i 's/<a id="user-content-/<a id="/g' $temp_file
+    sed -i 's/<a id="user-content-/<a id="/g' "$temp_file"
 fi
 
 
@@ -216,8 +216,8 @@ fi
 
 if [ "$using_stdout" == "true" ];
 then
-    cat $temp_file
+    cat "$temp_file"
 else
-    cp $temp_file ${2}
+    cp "$temp_file" "${2}"
     echo "Succesfully written HTML to ${2}"
 fi
